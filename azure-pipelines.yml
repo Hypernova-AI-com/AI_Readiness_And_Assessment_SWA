@@ -1,0 +1,44 @@
+# Azure DevOps pipeline — build the SPA + Azure Functions API and deploy to
+# Azure Static Web Apps.
+#
+# Setup in Azure DevOps (one-time):
+#   1. Pipelines → New pipeline → point at this repo (GitHub or Azure Repos).
+#   2. Add a SECRET variable `deployment_token` = the Static Web App deployment
+#      token (az staticwebapp secrets list ... --query properties.apiKey).
+#   3. Add plain variables for the public build-time vars below.
+# Server SECRETS (GRAPH_CLIENT_SECRET, STRIPE_SECRET_KEY, …) are NOT set here —
+# they live in the Static Web App's application settings / Key Vault.
+
+trigger:
+  branches:
+    include:
+      - main
+
+pr:
+  branches:
+    include:
+      - main
+
+pool:
+  vmImage: ubuntu-latest
+
+jobs:
+  - job: build_and_deploy
+    displayName: Build and deploy to Azure Static Web Apps
+    steps:
+      - checkout: self
+        submodules: true
+
+      - task: AzureStaticWebApp@0
+        displayName: Build + deploy (SWA)
+        inputs:
+          # Repo-relative locations.
+          app_location: '/'        # SPA source (built with `npm run build`)
+          api_location: 'api'      # Azure Functions app (built with its own tsc)
+          output_location: 'dist'  # SPA build output consumed by SWA
+          azure_static_web_apps_api_token: $(deployment_token)
+        env:
+          # PUBLIC build-time vars — inlined into the browser bundle by Vite.
+          # Define these as (non-secret) pipeline variables.
+          VITE_CALCOM_LINK: $(VITE_CALCOM_LINK)
+          VITE_STRIPE_ENABLED: $(VITE_STRIPE_ENABLED)
