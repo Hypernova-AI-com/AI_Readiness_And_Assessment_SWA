@@ -1,0 +1,231 @@
+@import "tailwindcss";
+
+/* ─────────────────────────────────────────────────────────────────────────
+   HyperNova AI — design tokens (ported 1:1 from the original static site).
+   Exposed to Tailwind v4 via @theme so utilities like `text-lime`,
+   `bg-surface`, `border-hairline`, `font-display` resolve to these values.
+   ───────────────────────────────────────────────────────────────────────── */
+@theme {
+  /* Brand + surfaces */
+  --color-lime: #95ff00;
+  --color-lime-bright: #b6ff4d;
+  --color-lime-deep: #6fbf00;
+  --color-sky: #a5cdff;
+
+  --color-ink: #8a8d92; /* muted body text */
+  --color-surface: #08090b; /* base background */
+  --color-surface-raised: #15171a;
+  --color-surface-muted: #1e2024;
+  --color-hairline: #2a2d32; /* borders / dividers */
+
+  /* Type families */
+  --font-display: "Anton", "Almarai", sans-serif;
+  --font-body: "Almarai", sans-serif;
+  --font-mono: "DM Mono", monospace;
+
+  /* Hero display scale */
+  --text-hero: clamp(48px, 8.5vw, 124px);
+
+  /* Signature glow */
+  --shadow-glow: 0 0 48px rgba(149, 255, 0, 0.2);
+}
+
+/* ── Base ──────────────────────────────────────────────────────────────── */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    background: var(--color-surface);
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    overflow-x: hidden;
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 20px;
+    color: var(--color-ink);
+    background:
+      radial-gradient(circle at 76% 0%, rgba(149, 255, 0, 0.12), transparent 28%),
+      radial-gradient(circle at 8% 18%, rgba(165, 205, 255, 0.09), transparent 24%),
+      linear-gradient(180deg, #0f1113 0%, #08090b 42%, #08090b 100%);
+  }
+
+  /* Masked grid overlay — the site's signature backdrop. */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: -1;
+    background-image:
+      linear-gradient(rgba(149, 255, 0, 0.055) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(149, 255, 0, 0.045) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.18) 58%, transparent);
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+  img {
+    max-width: 100%;
+    display: block;
+  }
+  ::selection {
+    background: var(--color-lime);
+    color: #000;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-lime);
+    outline-offset: 4px;
+    border-radius: 6px;
+  }
+
+  h1,
+  h2,
+  h3,
+  p {
+    margin: 0;
+  }
+}
+
+/* ── Reusable component classes (kept as CSS so the JSX stays readable) ──── */
+@layer components {
+  .container-x {
+    width: min(1180px, calc(100% - 32px));
+    margin: 0 auto;
+  }
+
+  /* Pill buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0 20px;
+    border: 1px solid rgba(149, 255, 0, 0.5);
+    border-radius: 9999px;
+    font-family: var(--font-body);
+    font-weight: 800;
+    line-height: 1;
+    cursor: pointer;
+    white-space: nowrap;
+    transition:
+      transform 150ms,
+      box-shadow 150ms,
+      background 150ms,
+      border-color 150ms,
+      color 150ms;
+  }
+  .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  .btn-primary {
+    color: #000;
+    background: var(--color-lime);
+    box-shadow: var(--shadow-glow);
+  }
+  .btn-primary:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 64px rgba(149, 255, 0, 0.3);
+  }
+  .btn-secondary {
+    color: #fff;
+    background: rgba(21, 23, 26, 0.72);
+    border-color: var(--color-hairline);
+  }
+  .btn-secondary:hover {
+    border-color: rgba(149, 255, 0, 0.58);
+    color: var(--color-lime);
+  }
+  .btn:not(:disabled):active {
+    transform: translateY(1px) scale(0.99);
+  }
+  .btn-block {
+    width: 100%;
+  }
+  .btn-lg {
+    min-height: 54px;
+    font-size: 16px;
+    padding: 0 28px;
+  }
+
+  .kicker {
+    color: var(--color-lime);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+  }
+
+  /* Hero canvas hosts — exact sizing/overhang from the original site. */
+  .pixeldrift-host {
+    width: 120%;
+    height: 158px;
+    margin: 0 0 -70px -10%;
+  }
+  .blackhole-host {
+    width: 125%;
+    max-width: none;
+    aspect-ratio: 1 / 1;
+    align-self: center;
+    margin: -46px 0 -54px -12.5%;
+    opacity: 0;
+    transition: opacity 1.4s ease;
+    overflow: hidden;
+    pointer-events: none;
+    position: relative;
+  }
+  .blackhole-host.is-ready {
+    opacity: 1;
+  }
+  @media (max-width: 900px) {
+    .pixeldrift-host {
+      width: 112%;
+      margin-left: -6%;
+      height: 125px;
+      margin-bottom: -48px;
+    }
+    .blackhole-host {
+      width: 112%;
+      margin-left: -6%;
+    }
+  }
+}
+
+/* Bold lime scrollbar for the embedded scheduler, so it's obvious there are
+   more time slots below the fold. Applies to the outer wrapper (the Cal.com
+   iframe itself is cross-origin and can't be styled). */
+.calscroll {
+  scrollbar-width: auto;
+  scrollbar-color: #95ff00 #15171a;
+}
+.calscroll::-webkit-scrollbar {
+  width: 14px;
+}
+.calscroll::-webkit-scrollbar-track {
+  background: rgba(21, 23, 26, 0.9);
+  border-radius: 10px;
+}
+.calscroll::-webkit-scrollbar-thumb {
+  background: #95ff00;
+  border-radius: 10px;
+  border: 3px solid #15171a;
+  box-shadow: 0 0 12px rgba(149, 255, 0, 0.55);
+}
+.calscroll::-webkit-scrollbar-thumb:hover {
+  background: #b6ff4d;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "version": 1,
+  "skills": [
+    {
+      "id": "taste-skill/brandkit",
+      "name": "brandkit",
+      "sourcePath": "M:\\VAULT-X\\SkillForge\\GitHub\\taste-skill\\skills\\brandkit",
+      "sourceCommit": null,
+      "contentHash": "60767A3C548DB3608DA6D15727400514C9976BFCDDC1D60CC907075E69AFF156",
+      "injectedAt": "2026-07-21T09:54:56.2018894-04:00"
+    },
+    {
+      "id": "taste-skill/design-taste-frontend",
+      "name": "design-taste-frontend",
+      "sourcePath": "M:\\VAULT-X\\SkillForge\\GitHub\\taste-skill\\skills\\taste-skill",
+      "sourceCommit": null,
+      "contentHash": "D6D35BC005A8C63DB593F4C54608695C20A378D8737FEBD3F60FB9A55FA17CA7",
+      "injectedAt": "2026-07-21T09:54:56.2399719-04:00"
+    },
+    {
+      "id": "taste-skill/design-taste-frontend-v1",
+      "name": "design-taste-frontend-v1",
+      "sourcePath": "M:\\VAULT-X\\SkillForge\\GitHub\\taste-skill\\skills\\taste-skill-v1",
+      "sourceCommit": null,
+      "contentHash": "D33352DC3716000B3E247FE63A9CED63A37DBA417F7434712E096D9C40609A6C",
+      "injectedAt": "2026-07-21T09:54:56.2647355-04:00"
+    },
+    {
+      "id": "taste-skill/full-output-enforcement",
+      "name": "full-output-enforcement",
+      "sourcePath": "M:\\VAULT-X\\SkillForge\\GitHub\\taste-skill\\skills\\output-skill",
+      "sourceCommit": null,
+      "contentHash": "B17055A573703E4C0D7F4C39502386260BBAFA1CA0F3A53EADB5282C1FE44DE5",
+      "injectedAt": "2026-07-21T09:54:56.2798256-04:00"
+    },
+    {
+      "id": "taste-skill/gpt-taste",
+      "name": "gpt-taste",
+      "sourcePath": "M:\\VAULT-X\\SkillForge\\GitHub\\taste-skill\\skills\\gpt-tasteskill",
+      "sourceCommit": null,
+      "contentHash": "0E4785E9F21C2B3D3E4A83FCDB3E9A88C6EA9EAD0C6311002D7DC78BE5737E3D",
+      "injectedAt": "2026-07-21T09:54:56.2954495-04:00"
+    },
+    {
+      "id": "taste-skill/high-end-visual-design",
+      "name": "high-end-visual-design",
+      "sourcePath": "M:\\VAULT-X\\SkillForge\\GitHub\\taste-skill\\skills\\soft-skill",
+      "sourceCommit": null,
+      "contentHash": "D39C980D1B2B86A5E56A1FDCDA7B33D9FFBF6C1F554B920F78F17378510C1DA9",
+      "injectedAt": "2026-07-21T09:54:56.3222893-04:00"
+    },
+    {
+      "id": "taste-skill/image-to-code",
+      "name": "image-to-code",
+      "sourcePath": "M:\\VAULT-X\\SkillForge\\GitHub\\taste-skill\\skills\\image-to-code-skill",
+      "sourceCommit": null,
+      "contentHash": "8F861260241709338DB60296E543FB89C831975F622CC53EE8EDC9F1B7526B9D",
+      "injectedAt": "2026-07-21T09:54:56.3504093-04:00"
+    },
+    {
+      "id": "taste-skill/imagegen-frontend-mobile",
+      "name": "imagegen-frontend-mobile",
+      "sourcePath": "M:\\VAULT-X\\SkillForge\\GitHub\\taste-skill\\skills\\imagegen-frontend-mobile",
+      "sourceCommit": null,
+      "contentHash": "F443D2C9A8EF086A6D6DFEC534781C5535BB86681E4913D49A72BFB299A41E62",
+      "injectedAt": "2026-07-21T09:54:56.3730602-04:00"
+    },
+    {
+      "id": "taste-skill/imagegen-frontend-web",
+      "name": "imagegen-frontend-web",
+      "sourcePath": "M:\\VAULT-X\\SkillForge\\GitHub\\taste-skill\\skills\\imagegen-frontend-web",
+      "sourceCommit": null,
+      "contentHash": "E1F4DF83C0B77586ADDA443FD20B9B2A0698F5F2CF30D9E594194CF44E7980CD",
+      "injectedAt": "2026-07-21T09:54:56.4075901-04:00"
+    },
+    {
+      "id": "taste-skill/industrial-brutalist-ui",
+      "name": "industrial-brutalist-ui",
+      "sourcePath": "M:\\VAULT-X\\SkillForge\\GitHub\\taste-skill\\skills\\brutalist-skill",
+      "sourceCommit": null,
+      "contentHash": "9600F2EEDE1A1DC2700870ACB721481257BCD9F80E2BD9FB6885000CBC6C9E44",
+      "injectedAt": "2026-07-21T09:54:56.4303636-04:00"
+    },
+    {
+      "id": "taste-skill/minimalist-ui",
+      "name": "minimalist-ui",
+      "sourcePath": "M:\\VAULT-X\\SkillForge\\GitHub\\taste-skill\\skills\\minimalist-skill",
+      "sourceCommit": null,
+      "contentHash": "05CC85E378CDE1D3ABBF086A678DC47D18038612F8750521C66A02CEB8E6C1EC",
+      "injectedAt": "2026-07-21T09:54:56.4485387-04:00"
+    },
+    {
+      "id": "taste-skill/redesign-existing-projects",
+      "name": "redesign-existing-projects",
+      "sourcePath": "M:\\VAULT-X\\SkillForge\\GitHub\\taste-skill\\skills\\redesign-skill",
+      "sourceCommit": null,
+      "contentHash": "BABA87104E9688CF08054310E2C05869F3844AA320416269D6E2136193F4B478",
+      "injectedAt": "2026-07-21T09:54:56.4729564-04:00"
+    },
+    {
+      "id": "taste-skill/stitch-design-taste",
+      "name": "stitch-design-taste",
+      "sourcePath": "M:\\VAULT-X\\SkillForge\\GitHub\\taste-skill\\skills\\stitch-skill",
+      "sourceCommit": null,
+      "contentHash": "649C8408CE828D245417AF13E575B15641FA51A102A1398D4338F120712F5584",
+      "injectedAt": "2026-07-21T09:54:56.5226693-04:00"
+    }
+  ]
+}
