@@ -92,19 +92,34 @@ function SendMessageCard() {
   );
 }
 
-/* ── Right card: Schedule a time (live Cal.com, shrunk to fit) ───────────── */
+/* ── Right card: Schedule a time (LIVE Cal.com inline embed) ───────────────────
+   Renders real Cal.com availability and writes the booking straight to the
+   Cal.com calendar — confirmation email, timezone handling, and reschedule /
+   cancel links are all managed by Cal.com. No mailto, nothing to reconcile by
+   hand. Themed to match the brand (dark surface, lime accent). Falls back to a
+   setup hint if VITE_CALCOM_LINK isn't configured. */
+const CAL_NAMESPACE = CALCOM_LINK.split("/").pop() || "book";
+
 function ScheduleCard() {
   useEffect(() => {
     if (!CALCOM_LINK) return;
+    let cancelled = false;
     (async () => {
-      const cal = await getCalApi({ namespace: "hna" });
+      const cal = await getCalApi({ namespace: CAL_NAMESPACE });
+      if (cancelled) return;
       cal("ui", {
         theme: "dark",
-        cssVarsPerTheme: { light: { "cal-brand": "#95ff00" }, dark: { "cal-brand": "#95ff00" } },
         hideEventTypeDetails: false,
         layout: "month_view",
+        cssVarsPerTheme: {
+          light: { "cal-brand": "#95ff00" },
+          dark: { "cal-brand": "#95ff00" },
+        },
       });
     })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   return (
@@ -113,30 +128,25 @@ function ScheduleCard() {
         <IconCalendar />
         <h3 className="font-display text-2xl uppercase tracking-wide text-white">Schedule a time</h3>
       </div>
-      <p className="mb-5 text-sm text-white/55">Pick a day, then scroll to an open time - you'll get a Microsoft Teams invite.</p>
+      <p className="mb-5 text-sm text-white/55">
+        Pick a day and a slot — booked straight onto our calendar and confirmed by email instantly.
+      </p>
 
       {CALCOM_LINK ? (
-        <>
-          <div
-            className="calscroll rounded-xl border border-hairline"
-            style={{ height: 560, overflowY: "auto", overflowX: "hidden" }}
-          >
-            <Cal
-              namespace="hna"
-              calLink={CALCOM_LINK}
-              style={{ width: "100%" }}
-              config={{ layout: "month_view", theme: "dark" }}
-            />
-          </div>
-          <p className="mt-2.5 flex items-center justify-center gap-1.5 text-xs font-semibold text-lime">
-            <span aria-hidden="true">↓</span> Scroll for open times
-          </p>
-        </>
+        <div className="overflow-hidden rounded-xl border border-hairline bg-[#0f1113]">
+          <Cal
+            namespace={CAL_NAMESPACE}
+            calLink={CALCOM_LINK}
+            style={{ width: "100%", height: "100%", minHeight: 560, overflow: "scroll" }}
+            config={{ layout: "month_view", theme: "dark", name: "hello", email: "hello@hypernova-ai.com" }}
+          />
+        </div>
       ) : (
-        <div className="grid min-h-[540px] place-items-center rounded-xl border border-hairline p-8 text-center">
-          <p className="max-w-[360px] text-white/60">
-            Set <span className="font-mono text-lime">VITE_CALCOM_LINK</span> (e.g.{" "}
-            <span className="font-mono text-white">your-handle/15min</span>) and the calendar goes live.
+        <div className="rounded-xl border border-hairline bg-[#0f1113] p-6 text-sm text-white/60">
+          <p className="mb-2 font-medium text-white/80">Scheduler not configured yet.</p>
+          <p>
+            Set <code className="text-lime">VITE_CALCOM_LINK</code> to your Cal.com link
+            (<code>handle/event-slug</code>) and the live booking calendar shows up here.
           </p>
         </div>
       )}

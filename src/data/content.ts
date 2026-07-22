@@ -9,7 +9,7 @@ export const BRAND = {
   mark: "HNA",
   tagline: "Ready Beats Reactive",
   price: 199,
-  email: "hello@hypernovaai.com",
+  email: "hello@hypernova-ai.com",
 } as const;
 
 export const NAV_LINKS = [
