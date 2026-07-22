@@ -1,0 +1,21 @@
+{
+  "name": "hna-ai-assessment-api",
+  "version": "1.0.0",
+  "description": "Azure Functions (v4) backend for the HyperNova AI Readiness web app.",
+  "main": "dist/functions/*.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "prestart": "npm run build",
+    "start": "func start"
+  },
+  "dependencies": {
+    "@azure/functions": "^4.5.0",
+    "resend": "^4.5.0",
+    "stripe": "^17.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.2"
+  }
+}

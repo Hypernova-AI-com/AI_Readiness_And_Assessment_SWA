@@ -1,23 +1,22 @@
-import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { Resend } from "resend";
 
 /**
- * POST /api/lead
- * Validates a booking submission, emails it to the team, and is structured so a
- * database write (Supabase / Vercel KV / Postgres) can be dropped into
- * `storeLead` later.
+ * Framework-agnostic lead handling: validate → (store) → email. Returns a plain
+ * { status, body } so it can be driven by the Azure Functions adapter in
+ * production and by the Vite dev bridge locally — identical code path either way.
  *
  * Mail delivery picks a provider by which env vars are set:
  *   1. Microsoft Graph (preferred) — app-only client-credentials send.
- *        GRAPH_TENANT_ID      — Entra tenant ID
- *        GRAPH_CLIENT_ID      — app registration (client) ID
- *        GRAPH_CLIENT_SECRET  — client secret  (SERVER-ONLY — never VITE_)
- *        GRAPH_MAIL_SENDER    — mailbox to send FROM (must be a licensed
- *                               Exchange Online mailbox in this tenant)
- *   2. Resend (fallback)  — RESEND_API_KEY / LEAD_FROM_EMAIL
- * In both cases LEAD_TO_EMAIL sets the recipient (default hello@hypernovaai.com).
+ *        GRAPH_TENANT_ID / GRAPH_CLIENT_ID / GRAPH_CLIENT_SECRET / GRAPH_MAIL_SENDER
+ *   2. Resend (fallback) — RESEND_API_KEY / LEAD_FROM_EMAIL
+ *   LEAD_TO_EMAIL sets the recipient (default hello@hypernova-ai.com).
  * With none set, the lead is logged so nothing is lost during setup.
  */
+
+export interface CoreResult {
+  status: number;
+  body: unknown;
+}
 
 interface Lead {
   name: string;
@@ -83,24 +82,6 @@ function leadHtml(lead: Lead): string {
     </table>`;
 }
 
-/** Acquire an app-only Graph token via the client-credentials flow. */
-async function graphToken(): Promise<string> {
-  const tenant = process.env.GRAPH_TENANT_ID!;
-  const body = new URLSearchParams({
-    client_id: process.env.GRAPH_CLIENT_ID!,
-    client_secret: process.env.GRAPH_CLIENT_SECRET!,
-    scope: "https://graph.microsoft.com/.default",
-    grant_type: "client_credentials",
-  });
-  const resp = await fetch(`https://login.microsoftonline.com/${tenant}/oauth2/v2.0/token`, {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body,
-  });
-  if (!resp.ok) throw new Error(`Graph token request failed (${resp.status}): ${await resp.text()}`);
-  return ((await resp.json()) as { access_token: string }).access_token;
-}
-
 /** Acknowledgement email sent back to the person who submitted the form. */
 function acknowledgementHtml(lead: Lead): string {
   const firstName = lead.name.split(/\s+/)[0].replace(/</g, "&lt;");
@@ -142,6 +123,24 @@ function acknowledgementMail(lead: Lead): OutgoingMail {
     html: acknowledgementHtml(lead),
     replyTo: process.env.LEAD_TO_EMAIL ?? "hello@hypernova-ai.com", // their reply reaches the team
   };
+}
+
+/** Acquire an app-only Graph token via the client-credentials flow. */
+async function graphToken(): Promise<string> {
+  const tenant = process.env.GRAPH_TENANT_ID!;
+  const body = new URLSearchParams({
+    client_id: process.env.GRAPH_CLIENT_ID!,
+    client_secret: process.env.GRAPH_CLIENT_SECRET!,
+    scope: "https://graph.microsoft.com/.default",
+    grant_type: "client_credentials",
+  });
+  const resp = await fetch(`https://login.microsoftonline.com/${tenant}/oauth2/v2.0/token`, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body,
+  });
+  if (!resp.ok) throw new Error(`Graph token request failed (${resp.status}): ${await resp.text()}`);
+  return ((await resp.json()) as { access_token: string }).access_token;
 }
 
 async function sendViaGraph(token: string, sender: string, mail: OutgoingMail): Promise<void> {
@@ -210,26 +209,24 @@ async function emailLead(lead: Lead): Promise<void> {
     return;
   }
 
-  // No provider wired yet — surface the lead in the function logs so nothing
-  // is lost during setup.
+  // No provider wired yet — surface the lead in the logs so nothing is lost.
   console.log("[lead] (no mail provider configured) captured lead:", JSON.stringify(lead));
 }
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
-  if (req.method !== "POST") {
-    res.setHeader("Allow", "POST");
-    return res.status(405).json({ ok: false, error: "Method not allowed." });
-  }
-
-  const result = validate(req.body);
-  if (!result.ok) return res.status(400).json({ ok: false, error: result.error });
+/** Validate a submission, email it, and return a plain HTTP-ish result. */
+export async function handleLead(body: unknown): Promise<CoreResult> {
+  const result = validate(body);
+  if (!result.ok) return { status: 400, body: { ok: false, error: result.error } };
 
   try {
     await storeLead(result.lead);
     await emailLead(result.lead);
-    return res.status(200).json({ ok: true });
+    return { status: 200, body: { ok: true } };
   } catch (err) {
     console.error("[lead] failed:", err);
-    return res.status(500).json({ ok: false, error: "Could not submit your details. Please email us directly." });
+    return {
+      status: 500,
+      body: { ok: false, error: "Could not submit your details. Please email us directly." },
+    };
   }
 }

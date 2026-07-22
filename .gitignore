@@ -4,9 +4,15 @@ dist-ssr
 *.local
 .env
 .env*.local
-.vercel
 .DS_Store
 *.log
+
+# Azure Functions
+api/dist
+api/local.settings.json
+bin
+obj
+.python_packages
 
 # TypeScript incremental build cache
 *.tsbuildinfo
