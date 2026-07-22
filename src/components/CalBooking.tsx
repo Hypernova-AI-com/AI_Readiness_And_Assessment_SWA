@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import Cal, { getCalApi } from "@calcom/embed-react";
-import { BRAND, PRIORITY_OPTIONS } from "../data/content";
+import { PRIORITY_OPTIONS } from "../data/content";
 import { CALCOM_LINK } from "../lib/config";
+import { submitLead } from "../lib/api";
 
 /* ── Inline icons (lime) — no icon lib, matches the anti-emoji rule ──────── */
 function IconMail() {
@@ -26,20 +27,56 @@ const inputCls =
 const labelCls = "mb-1.5 block text-xs text-white/60";
 const cardCls = "rounded-2xl border border-hairline bg-surface-raised/60 p-6 md:p-8";
 
-/* ── Left card: Send a message (opens the visitor's mail client, prefilled) ── */
+/* ── Left card: Send a message (POSTs to /api/lead → Graph email, no mail client) ── */
+type SendStatus = "idle" | "sending" | "sent" | "error";
+
 function SendMessageCard() {
   const [name, setName] = useState("");
   const [company, setCompany] = useState("");
   const [email, setEmail] = useState("");
   const [priority, setPriority] = useState("");
   const [message, setMessage] = useState("");
+  const [status, setStatus] = useState<SendStatus>("idle");
+  const [error, setError] = useState("");
 
-  const lines = [`Name: ${name}`, `Company: ${company}`, `Email: ${email}`];
-  if (priority) lines.push(`Priority: ${priority}`);
-  lines.push("", message);
-  const mailto = `mailto:${BRAND.email}?subject=${encodeURIComponent(
-    `AI Readiness inquiry${name ? ` — ${name}` : ""}`,
-  )}&body=${encodeURIComponent(lines.join("\n"))}`;
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+    if (!name.trim() || !company.trim() || !email.trim()) {
+      setError("Name, company, and work email are required.");
+      setStatus("error");
+      return;
+    }
+    setStatus("sending");
+    const res = await submitLead({
+      name,
+      business: company,
+      email,
+      priority: priority || undefined,
+      pain: message || undefined,
+    });
+    if (res.ok) {
+      setStatus("sent");
+    } else {
+      setStatus("error");
+      setError(res.error ?? "Something went wrong — please try again.");
+    }
+  }
+
+  if (status === "sent") {
+    return (
+      <div className={cardCls}>
+        <div className="mb-1 flex items-center gap-2.5">
+          <IconMail />
+          <h3 className="font-display text-2xl uppercase tracking-wide text-white">Message sent</h3>
+        </div>
+        <p className="text-sm text-white/70">
+          Thanks{name ? `, ${name.split(/\s+/)[0]}` : ""} — we've got your request and a
+          confirmation is on its way to your inbox. We'll be in contact shortly.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className={cardCls}>
@@ -47,9 +84,9 @@ function SendMessageCard() {
         <IconMail />
         <h3 className="font-display text-2xl uppercase tracking-wide text-white">Send a message</h3>
       </div>
-      <p className="mb-6 text-sm text-white/55">We'll open your email client with everything pre-filled.</p>
+      <p className="mb-6 text-sm text-white/55">Fill this in and we'll be in touch — no email client required.</p>
 
-      <div className="grid gap-4">
+      <form className="grid gap-4" onSubmit={handleSubmit}>
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <label className={labelCls}>Full name</label>
@@ -84,10 +121,15 @@ function SendMessageCard() {
             placeholder="Repetitive tasks, scattered data, slow follow-up, or work your team dreads."
           />
         </div>
-        <a href={mailto} className="btn btn-primary btn-block btn-lg mt-1">
-          Send message →
-        </a>
-      </div>
+        {error && <p className="text-sm text-red-400">{error}</p>}
+        <button
+          type="submit"
+          disabled={status === "sending"}
+          className="btn btn-primary btn-block btn-lg mt-1 disabled:opacity-60"
+        >
+          {status === "sending" ? "Sending…" : "Send message →"}
+        </button>
+      </form>
     </div>
   );
 }
