@@ -29,16 +29,18 @@ jobs:
       # Build the SPA ourselves so the deploy uploads the compiled bundle.
       # (Letting the SWA/Oryx build run was shipping the un-built source —
       # index.html pointing at /src/main.tsx — which rendered a white screen.)
-      - name: Install & build frontend
+      # Install BOTH before building: the root `tsc -b` also type-checks api/,
+      # so @azure/functions must be present (api/node_modules) first.
+      - name: Install dependencies (root + api)
         run: |
           npm ci
-          npm run build
+          npm --prefix api ci
+      - name: Build frontend
+        run: npm run build
         env:
           VITE_CALCOM_LINK: "harrison-alexander-58mgnt/30min"
-      - name: Install & build API (Azure Functions v4)
-        run: |
-          npm --prefix api ci
-          npm --prefix api run build
+      - name: Build API (Azure Functions v4)
+        run: npm --prefix api run build
       - name: Deploy prebuilt output
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
